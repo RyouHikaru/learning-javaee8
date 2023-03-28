@@ -15,6 +15,9 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 @Stateless // does not keep state; used for independent operations; goes back to bean pool to serve other clients
 public class QueryService {
@@ -143,5 +146,17 @@ public class QueryService {
     
     public List<Department> getDeparments() {
         return null;
+    }
+    
+    public Collection<Employee> bla() {
+//        SELECT e FROM Employee e WHERE e.fullName = 'Average Joe'
+        
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Employee> c = cb.createQuery(Employee.class);
+        Root<Employee> emp = c.from(Employee.class);
+        CriteriaQuery<Employee> query = c.select(emp)
+                .where(cb.equal(emp.get("fullName"), "Average Joe"));
+        
+        return entityManager.createQuery(query).getResultList();
     }
 }

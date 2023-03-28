@@ -16,10 +16,13 @@ import java.util.Map;
 import java.util.Set;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 
 /**
  * @author Seeraj
@@ -83,6 +86,7 @@ public class Employee extends AbstractEntity {
     public static final String GET_ALL_PARKING_SPACES = "Employee.getAllParkingSpaces";
 
     @NotEmpty(message = "Name cannot be empty")
+    @Size(max = 40, message = "Full name must be less than 40 characters")
     @Basic
     private String fullName;
 
@@ -91,6 +95,7 @@ public class Employee extends AbstractEntity {
     private LocalDate dateOfBirth; //yyyy-MM-dd
 
     @NotNull(message = "Basic salary must be set")
+    @DecimalMin(value = "500", message = "Basic salary must be equal to or exceed 500")
     private BigDecimal basicSalary;
 
     @NotNull(message = "Hired date must be set")
@@ -120,6 +125,7 @@ public class Employee extends AbstractEntity {
     @Column(name = "NICKY")
     private Collection<String> nickNames;
     
+    @DecimalMax(value = "60", message = "Age must not exceed 60")
     private int age;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE }) // Allowance will be saved and removed along employee

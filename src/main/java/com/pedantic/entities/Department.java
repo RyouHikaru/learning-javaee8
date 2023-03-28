@@ -2,6 +2,8 @@ package com.pedantic.entities;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ public class Department extends AbstractEntity {
     public static final String GET_DEPARTMENT_NAMES = "Department.getDeptNames";
 
     @NotEmpty(message = "Department name must be set")
+    @Pattern(regexp = "", message = "Department name must be in the form Dept Abbreviation, Number, and Branch")
     private String departmentName;
 
 //    @OneToMany(mappedBy = "department") // The other entity has the Foreign key column

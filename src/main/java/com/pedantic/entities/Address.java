@@ -1,6 +1,7 @@
 package com.pedantic.entities;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Email;
 
 @Embeddable
 public class Address {
@@ -11,8 +12,10 @@ public class Address {
     private String country;
     private String phone;
     private String state;
-
-
+    
+    @Email(message = "Email must be in the form user@domain.com")
+    private String email;
+    
     public String getStreetAddress() {
         return streetAddress;
     }
