@@ -8,6 +8,7 @@ import com.pedantic.config.AbstractEntityListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Entity
 @NamedQuery(name = Department.GET_DEPARTMENT_LIST,  query = "SELECT d FROM Department d") // Compiled together with classes and can be optimized
@@ -65,11 +66,31 @@ public class Department extends AbstractEntity {
         this.departmentName = departmentName;
     }
 
-//    public List<Employee> getEmployees() {
-//        return employees;
-//    }
-//
-//    public void setEmployees(List<Employee> employees) {
-//        this.employees = employees;
-//    }
+    public Map<Long, Employee> getEmployees() {
+        return employees;
+    }
+
+    public void setEmployees(Map<Long, Employee> employees) {
+        this.employees = employees;
+    }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Department other = (Department) obj;
+		return Objects.equals(getDepartmentName().toUpperCase(), other.departmentName.toUpperCase());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getDepartmentName().toUpperCase());
+	}
+
+    
+    
 }

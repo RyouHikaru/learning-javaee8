@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
@@ -31,6 +32,7 @@ import com.pedantic.config.EmployeeListener;
  * @author Seeraj
  */
 @Entity
+@NamedNativeQuery(name = "Employee.findAllNativeNamed", query = "SELECT * FROM Employee", resultClass = Employee.class)
 @NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES, query = "SELECT al FROM Employee e JOIN e.employeeAllowances al WHERE al.allowanceAmount > :greaterThanValue")
 @NamedQuery(name = "", query = "SELECT e FROM Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
 @NamedQuery(name = "", query = "SELECT e.fullName, KEY(p), VALUE(p) FROM Employee e JOIN e.employeePhoneNumbers p") // Querying Maps
@@ -69,6 +71,9 @@ public class Employee extends AbstractEntity {
 	@Size(max = 40, message = "Full name must be less than 40 characters")
 	@Basic
 	private String fullName;
+	
+	@NotEmpty(message = "Social security number must be set")
+	private String socialSecurityNumberString;
 
 	@Past(message = "Date of birth must be in the past")
 	@JsonbDateFormat(value = "yyyy-MM-dd")
@@ -301,5 +306,32 @@ public class Employee extends AbstractEntity {
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	public String getSocialSecurityNumberString() {
+		return socialSecurityNumberString;
+	}
+
+	public void setSocialSecurityNumberString(String socialSecurityNumberString) {
+		this.socialSecurityNumberString = socialSecurityNumberString;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getSocialSecurityNumberString().toUpperCase());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Employee other = (Employee) obj;
+		return Objects.equals(getSocialSecurityNumberString().toUpperCase(), other.socialSecurityNumberString.toUpperCase());
+	}
+	
+	
 
 }

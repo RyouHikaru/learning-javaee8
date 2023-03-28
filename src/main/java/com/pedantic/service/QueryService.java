@@ -159,4 +159,13 @@ public class QueryService {
         
         return entityManager.createQuery(query).getResultList();
     }
+    
+    public Collection<Employee> findAllEmployeesNative() {
+    	return entityManager.createNamedQuery("Employee.findAllNativeNamed", Employee.class).getResultList();
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Collection<Department> getDepartmentsNativeQuery() {
+    	return entityManager.createNativeQuery("SELECT * FROM Department", Department.class).getResultList();
+	}
 }
