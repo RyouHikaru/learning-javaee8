@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTransient;
+import javax.json.bind.config.PropertyOrderStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
@@ -36,8 +39,8 @@ import com.pedantic.config.EmployeeListener;
 @NamedNativeQuery(name = "Employee.findAllNativeNamed", query = "SELECT * FROM Employee", resultClass = Employee.class)
 @NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES, query = "SELECT al FROM Employee e JOIN e.employeeAllowances al WHERE al.allowanceAmount > :greaterThanValue")
 @NamedQuery(name = Employee.EMPLOYEE_SALARY_BOUND, query = "SELECT e FROM Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
-@NamedQuery(name = "", query = "SELECT e.fullName, KEY(p), VALUE(p) FROM Employee e JOIN e.employeePhoneNumbers p") // Querying Maps
-//@NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES, query = "SELECT e FROM Employee e JOIN FETCH e.employeeAllowances")
+@NamedQuery(name = Employee.GET_EMPLOYEE_PHONE_NUMBERS, query = "SELECT e.fullName, KEY(p), VALUE(p) FROM Employee e JOIN e.employeePhoneNumbers p") // Querying Maps
+@NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES_JOIN_FETCH, query = "SELECT e FROM Employee e JOIN FETCH e.employeeAllowances")
 @NamedQuery(name = Employee.GET_ALL_PARKING_SPACES, query = "SELECT e.parkingSpace FROM Employee e")
 @NamedQuery(name = Employee.EMPLOYEE_PROJECTION, query = "SELECT e.fullName, e.basicSalary FROM Employee e") // Will return a collection of Object array
 @NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJ, query = "SELECT new com.pedantic.entities.EmployeeDetails(e.fullName, e.basicSalary, e.department.departmentName) from Employee e")
@@ -47,9 +50,9 @@ import com.pedantic.config.EmployeeListener;
 @NamedQuery(name = Employee.FIND_PAST_PAYSLIP_BY_ID, query = "select p from Employee e join e.pastPayslips p where e.id = :employeeId and e.userEmail =:email and p.id =:payslipId and p.userEmail = :email")
 @NamedQuery(name = Employee.GET_PAST_PAYSLIPS, query = "select p from Employee e inner join e.pastPayslips p where e.id = :employeeId and e.userEmail=:email")
 //@Table(name = "Employee", schema = "HR")
+//@JsonbPropertyOrder(PropertyOrderStrategy.REVERSE)
 @EntityListeners({ EmployeeListener.class, AbstractEntityListener.class })
 public class Employee extends AbstractEntity implements Serializable {
-//public class Employee {
 
 //    Create a table containing primary key generated. This is the most flexible.
 //    @TableGenerator(name = "Emp_Gen", table = "ID_GEN", pkColumnName = "GEN_NAME", valueColumnName = "GEN_VALUE")
@@ -61,12 +64,14 @@ public class Employee extends AbstractEntity implements Serializable {
 	public static final String EMPLOYEE_PROJECTION = "Employee.nameAndSalaryProjection";
 	public static final String EMPLOYEE_CONSTRUCTOR_PROJ = "Employee.projection";
 	public static final String GET_EMPLOYEE_ALLOWANCES = "Employee.getAllowances";
+	public static final String GET_EMPLOYEE_ALLOWANCES_JOIN_FETCH = "Employee.getAllowancesJoinFetch";
 	public static final String FIND_BY_ID = "Employee.findById";
 	public static final String FIND_BY_NAME = "Employee.findByName";
 	public static final String LIST_EMPLOYEES = "Employee.listEmployees";
 	public static final String FIND_PAST_PAYSLIP_BY_ID = "Employee.findPastPayslipById";
 	public static final String GET_PAST_PAYSLIPS = "Employee.getPastPayslips";
 	public static final String GET_ALL_PARKING_SPACES = "Employee.getAllParkingSpaces";
+    public static final String GET_EMPLOYEE_PHONE_NUMBERS = "Employee.getPhoneNumbers";
 
 	@NotEmpty(message = "Name cannot be empty")
 	@Size(max = 40, message = "Full name must be less than 40 characters")
@@ -104,17 +109,19 @@ public class Employee extends AbstractEntity implements Serializable {
 	@ElementCollection // maps collections of Elements (includes Embeddable classes)
 	@CollectionTable( // customize the Collection Table
 			name = "QUALIFICATIONS", joinColumns = @JoinColumn(name = "EMP_ID"))
+    @JsonbTransient
 	private Collection<Qualifications> qualifications;
 
 	@ElementCollection
 	@Column(name = "NICKY")
+	@JsonbTransient
 	private Collection<String> nickNames;
 
 	@DecimalMax(value = "60", message = "Age must not exceed 60")
 	private int age;
 
-	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE }) // Allowance will be saved and removed along
-																		// employee
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE }) // Allowance will be saved and removed along employee
+	@JsonbTransient
 	private Set<Allowance> employeeAllowances = new HashSet<>();
 
 	@OneToOne // Unidirectional to Payslip
@@ -127,6 +134,7 @@ public class Employee extends AbstractEntity implements Serializable {
 	private ParkingSpace parkingSpace;
 
 	@OneToMany
+	@JsonbTransient
 	private Collection<Payslip> pastPayslips = new ArrayList<>();
 
 	@ElementCollection

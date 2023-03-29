@@ -15,6 +15,8 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -58,6 +60,9 @@ public class EmployeeResource {
 	
 	@Inject
 	PersistenceService persistenceService;
+	
+	@Inject
+	JaxRsClient jaxRsClient;
 	
 	/**
 	 * GET Request to retrieve all employees
@@ -120,10 +125,21 @@ public class EmployeeResource {
 	@Path("employees")
 //	@Consumes("application/xml")
 	public Response createEmployee(@Valid Employee employee) { // Validate from Resource Layer instead from Persistence Layer
-		persistenceService.saveEmployee(employee);
-		
-		URI uri = uriInfo.getAbsolutePathBuilder().path(employee.getId().toString()).build();
-		return Response.created(uri).status(Response.Status.CREATED).build();
+        persistenceService.saveEmployee(employee);
+
+        URI uri = uriInfo.getAbsolutePathBuilder().path(employee.getId().toString()).build();
+
+        URI others = uriInfo.getBaseUriBuilder().path(EmployeeResource.class).path(EmployeeResource.class, "getEmployees").build();
+
+//        URI dept = uriInfo.getBaseUriBuilder().path(DepartmentResource.class).path(DepartmentResource.class, "getDepartmentById")
+//                .resolveTemplate("id", employee.getDepartment().getId()).build();
+
+        JsonObjectBuilder links = Json.createObjectBuilder().add("_links", Json.createArrayBuilder().add(Json.createObjectBuilder().add("_others", others.toString())
+                .add("_self", uri.toString()).build()
+        ));
+        jaxRsClient.postEmployeeToSSE(employee);
+
+        return Response.ok(links.build().toString()).status(Response.Status.CREATED).build();
 	}
 	
 	@POST
