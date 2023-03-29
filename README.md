@@ -7,8 +7,8 @@ by Luqman Saeed.
 
 Topics covered:
 
-* Java Persistence API 2.2
-* JPA Entity Relationship Mapping
-* JPQL
+* CDI (Context Dependency Injection) 2.0
+* JPA (Java Persistence API) 2.2
+* JAX-RS (Java API for RESTful Web Services) 2.1
 
 *Note: To be updated*
