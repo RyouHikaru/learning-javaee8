@@ -1,6 +1,7 @@
 package com.pedantic.service;
 
 import com.pedantic.entities.Allowance;
+import com.pedantic.entities.ApplicationUser;
 import com.pedantic.entities.Department;
 import com.pedantic.entities.Employee;
 import com.pedantic.entities.EmployeeDetails;
@@ -21,6 +22,9 @@ import javax.persistence.criteria.Root;
 
 @Stateless // does not keep state; used for independent operations; goes back to bean pool to serve other clients
 public class QueryService {
+	
+	@Inject
+	private SecurityUtil securityUtil;
     
     // This entityManager is injected from Producers
     @Inject
@@ -168,4 +172,16 @@ public class QueryService {
     public Collection<Department> getDepartmentsNativeQuery() {
     	return entityManager.createNativeQuery("SELECT * FROM Department", Department.class).getResultList();
 	}
+    
+
+    public boolean authenticateUser(String email, String plainTextPassword) {
+        ApplicationUser user = entityManager.createNamedQuery(ApplicationUser.FIND_USER_BY_CREDENTIALS, ApplicationUser.class)
+                .setParameter("email", email.toLowerCase()).getResultList().get(0);
+
+        if (user != null) {
+            return securityUtil.passwordsMatch(user.getPassword(), user.getSalt(), plainTextPassword);
+        }
+        
+        return false;
+    }
 }

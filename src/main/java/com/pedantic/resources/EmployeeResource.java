@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import com.pedantic.config.Secure;
 import com.pedantic.entities.Employee;
 import com.pedantic.service.PersistenceService;
 import com.pedantic.service.QueryService;
@@ -66,6 +67,7 @@ public class EmployeeResource {
 	@GET
 	@Path("employees")
 //	@Produces("application/xml")
+	@Secure
 	public Response getEmployees(@Context HttpHeaders httpHeaders) {
 		MediaType mediaType = httpHeaders.getAcceptableMediaTypes().get(0); // Get the media type of the highest priority
 		
