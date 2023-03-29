@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -163,6 +164,12 @@ public class EmployeeResource {
 		}
 		
 		return Response.noContent().build();
+	}
+	
+	@DELETE
+	@Path("{id: \\d+}") // api/v1/employees/{id} - DELETE
+	public Response terminateEmployee(@PathParam("id") @NotNull Long id) {
+		return Response.ok().build();
 	}
 
 }
