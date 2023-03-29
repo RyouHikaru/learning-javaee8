@@ -45,4 +45,12 @@ public class PersistenceService {
         employee.setParkingSpace(parkingSpace); // has Cascade PERSIST
         entityManager.persist(employee);
     }
+    
+    public void saveEmployee(Employee employee) {
+    	if (employee.getId() == null) {
+    		entityManager.persist(employee);
+    	} else {
+        	entityManager.merge(employee);
+    	}
+    }
 }

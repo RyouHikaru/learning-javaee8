@@ -5,6 +5,7 @@
  */
 package com.pedantic.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
@@ -34,9 +35,9 @@ import com.pedantic.config.EmployeeListener;
 @Entity
 @NamedNativeQuery(name = "Employee.findAllNativeNamed", query = "SELECT * FROM Employee", resultClass = Employee.class)
 @NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES, query = "SELECT al FROM Employee e JOIN e.employeeAllowances al WHERE al.allowanceAmount > :greaterThanValue")
-@NamedQuery(name = "", query = "SELECT e FROM Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
+@NamedQuery(name = Employee.EMPLOYEE_SALARY_BOUND, query = "SELECT e FROM Employee e WHERE e.basicSalary BETWEEN :lowerBound AND :upperBound")
 @NamedQuery(name = "", query = "SELECT e.fullName, KEY(p), VALUE(p) FROM Employee e JOIN e.employeePhoneNumbers p") // Querying Maps
-@NamedQuery(name = "", query = "SELECT e FROM Employee e JOIN FETCH e.employeeAllowances")
+//@NamedQuery(name = Employee.GET_EMPLOYEE_ALLOWANCES, query = "SELECT e FROM Employee e JOIN FETCH e.employeeAllowances")
 @NamedQuery(name = Employee.GET_ALL_PARKING_SPACES, query = "SELECT e.parkingSpace FROM Employee e")
 @NamedQuery(name = Employee.EMPLOYEE_PROJECTION, query = "SELECT e.fullName, e.basicSalary FROM Employee e") // Will return a collection of Object array
 @NamedQuery(name = Employee.EMPLOYEE_CONSTRUCTOR_PROJ, query = "SELECT new com.pedantic.entities.EmployeeDetails(e.fullName, e.basicSalary, e.department.departmentName) from Employee e")
@@ -47,7 +48,7 @@ import com.pedantic.config.EmployeeListener;
 @NamedQuery(name = Employee.GET_PAST_PAYSLIPS, query = "select p from Employee e inner join e.pastPayslips p where e.id = :employeeId and e.userEmail=:email")
 //@Table(name = "Employee", schema = "HR")
 @EntityListeners({ EmployeeListener.class, AbstractEntityListener.class })
-public class Employee extends AbstractEntity {
+public class Employee extends AbstractEntity implements Serializable {
 //public class Employee {
 
 //    Create a table containing primary key generated. This is the most flexible.
@@ -73,7 +74,7 @@ public class Employee extends AbstractEntity {
 	private String fullName;
 	
 	@NotEmpty(message = "Social security number must be set")
-	private String socialSecurityNumberString;
+	private String socialSecurityNumber;
 
 	@Past(message = "Date of birth must be in the past")
 	@JsonbDateFormat(value = "yyyy-MM-dd")
@@ -307,17 +308,17 @@ public class Employee extends AbstractEntity {
 		this.age = age;
 	}
 
-	public String getSocialSecurityNumberString() {
-		return socialSecurityNumberString;
+	public String getSocialSecurityNumber() {
+		return socialSecurityNumber;
 	}
 
-	public void setSocialSecurityNumberString(String socialSecurityNumberString) {
-		this.socialSecurityNumberString = socialSecurityNumberString;
+	public void setSocialSecurityNumber(String socialSecurityNumberString) {
+		this.socialSecurityNumber = socialSecurityNumberString;
 	}
-
+	
 	@Override
 	public int hashCode() {
-		return Objects.hash(getSocialSecurityNumberString().toUpperCase());
+		return Objects.hash(getSocialSecurityNumber().toUpperCase());
 	}
 
 	@Override
@@ -329,7 +330,7 @@ public class Employee extends AbstractEntity {
 		if (getClass() != obj.getClass())
 			return false;
 		Employee other = (Employee) obj;
-		return Objects.equals(getSocialSecurityNumberString().toUpperCase(), other.socialSecurityNumberString.toUpperCase());
+		return Objects.equals(getSocialSecurityNumber().toUpperCase(), other.socialSecurityNumber.toUpperCase());
 	}
 	
 	
