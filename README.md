@@ -1,4 +1,4 @@
-# Payroll
+# Learning Java EE 8
 
 A repository dedicated for learning Java EE 8. 
 
